@@ -1,0 +1,30 @@
+name: Publish Docker Image to Original Repo GHCR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Log in to the original repository's GitHub Container Registry
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}  # Or the original repo owner's username
+        password: ${{ secrets.ORIGINAL_REPO_PAT }}
+
+    # Build the Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t ghcr.io/rytimx/docker-image-automation/my-image:latest .
+
+    # Push the Docker image to the original repository's GHCR
+    - name: Push Docker image
+      run: |
+        docker push ghcr.io/rytimx/docker-image-automation/my-image:latest
